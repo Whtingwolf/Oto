@@ -1,10 +1,10 @@
 package converter;
 
-import com.jd.virtual.gateway.converter.abstraction.ConvertFrom;
-import com.jd.virtual.gateway.converter.abstraction.ConvertTO;
-import com.jd.virtual.gateway.converter.abstraction.Converter;
+import converter.abstraction.ConvertFrom;
+import converter.abstraction.ConvertTO;
+import converter.abstraction.Converter;
 
-public class DefaultConverter<S,T> implements Converter<S, T> {
+public class DefaultConverter<S, T> implements Converter<S, T> {
 
     ConvertFrom<T, S> from;
 

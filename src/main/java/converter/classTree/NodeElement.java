@@ -1,13 +1,13 @@
 package converter.classTree;
 
-import com.jd.virtual.gateway.converter.abstraction.Converter;
+
+import converter.abstraction.Converter;
 
 public class NodeElement {
 
     Class<?> clazz;
 
     Converter converter;
-
 
 
     public Class<?> getClazz() {
