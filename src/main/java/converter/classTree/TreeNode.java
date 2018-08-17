@@ -1,75 +1,94 @@
 package converter.classTree;
 
-import java.util.Enumeration;
+import java.util.List;
 
-public interface TreeNode {
+public interface TreeNode<T> {
 
     /**
-     * Returns the child TreeNode at index
-     * childIndex
+     * @return the node's data is null
      */
-    TreeNode getChildAt(int childIndex);
+    public boolean isEmpty();
 
     /**
-     * Returns the number of children TreeNodes the receiver
-     * contains.
+     * @param index the child's index
+     * @return the Node which extends TreeNode of the child
      */
-    int getChildCount();
+    public <R extends TreeNode<T>> R getChild(int index);
 
     /**
-     * Returns the parent TreeNode of the receiver.
+     * Get all children of the node
+     * @return a List of TreeNode
      */
-    TreeNode getParent();
+    public <R extends TreeNode<T>> List<R> getChildren();
 
     /**
-     * Returns the index of node in the receivers children.
-     * If the receiver does not contain node, -1 will be
-     * returned.
+     * insert a node if it can be inserted
+     * and set the child's parent is this.node
+     *
+     * @param child the inserted node
+     * @param index
      */
-    int getIndex(TreeNode node);
+    public <R extends TreeNode<T>> boolean insert(R child, int index);
 
     /**
-     * Returns true if the receiver allows children.
+     * remove child where on the index
+     * and remove parent from the child
+     *
+     * @param index the child position
+     * @return the remove child
      */
-    boolean getAllowsChildren();
+    public <R extends TreeNode<T>> R remove(int index);
 
     /**
-     * Returns true if the receiver is a leaf.
+     * get the node's parent
+     *
+     * @return Treenode
      */
-    boolean isLeaf();
+    public <R extends TreeNode<T>> R getParent();
 
     /**
-     * Returns the children of the receiver as an Enumeration.
+     * child set the parent node
+     *
+     * @param parent parent node
      */
-    Enumeration children();
+    public <R extends TreeNode<T>> void setParent(R parent);
 
     /**
-     * Returns the TreeNode's element whether extends Collection
-     */
-    boolean isCollectionNode();
-
-    /**
-     * Returns the TreeNode's element whether is null
+     * remove the parent Reference of parent
+     *
      * @return
      */
-    boolean isNullNode();
+
+    public <R extends TreeNode<T>> R removeParent();
 
     /**
-     * Returns the TreeNode's element whether extends Enum
+     * if the children contains a node equal the param node
+     * return true
+     *
+     * @param node the search node
      * @return
      */
-    boolean isEnumNode();
+    public boolean contains(TreeNode<T> node);
 
     /**
-     * Returns the TreeNode's element whether is a String
-     * @return
+     * return the node' data
+     *
+     * @return generic data
      */
-    boolean isStringNode();
+    public T getData();
 
     /**
-     * Returns the TreeNode's element whether is a Number
-     * @return
+     * set data
+     *
+     * @param data
      */
-    boolean isNumberNode();
+    public void setData(T data);
+
+    /**
+     * remove the node data
+     */
+    public void cleanData();
+
 
 }
+

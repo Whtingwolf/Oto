@@ -1,9 +1,9 @@
 package converter.parse;
 
-import converter.classTree.ParseTree;
+import converter.classTree.ParsedTree;
 
 public interface Parser {
 
-    public ParseTree parse(Object source);
+    public ParsedTree parse(Object o);
 
 }
