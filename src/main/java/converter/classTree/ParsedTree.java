@@ -12,10 +12,10 @@ public class ParsedTree {
 
     }
 
-    ParsedTree(Object object) {
+    public ParsedTree(Object object) {
         root = new BinaryTree<>();
         Class clazz = object.getClass();
-        Field[] fields = clazz.getFields();
+        Field[] fields = clazz.getDeclaredFields();
         for (Field f : fields) {
             Pair pair = new Pair(f.getName(), f.getType());
             if (isBasalType(f.getDeclaringClass())) {

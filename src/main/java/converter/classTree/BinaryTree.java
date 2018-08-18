@@ -169,6 +169,7 @@ public class BinaryTree<T> implements TreeNode<T> {
     public void add(BinaryTree<T> node) {
         if (this.firstChild == null) {
             this.firstChild = node;
+            return;
         }
         BinaryTree<T> temp = firstChild;
         while (temp.nextBro != null) {
