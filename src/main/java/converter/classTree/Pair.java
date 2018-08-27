@@ -11,6 +11,10 @@ public class Pair {
     public Pair() {
     }
 
+    public Pair(Class type) {
+        this.type = type;
+    }
+
     public Pair(String attrubuteName) {
         this.attrubuteName = attrubuteName;
     }
