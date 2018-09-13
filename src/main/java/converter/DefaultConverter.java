@@ -1,22 +1,61 @@
 package converter;
 
-import converter.abstraction.ConvertFrom;
-import converter.abstraction.ConvertTO;
-import converter.abstraction.Converter;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 
-public class DefaultConverter<S, T> implements Converter<S, T> {
+public class DefaultConverter {
 
-    ConvertFrom<T, S> from;
+    private Object source;
 
-    ConvertTO<S, T> to;
+    private Class<?> sourceClazz;
 
-    @Override
-    public S convertFrom(T source) {
-        return null;
+    private Class<?> production;
+
+    private HashMap<String, Method> methodMap;
+
+    public DefaultConverter(Object source, Class<?> production) {
+        this.source = source;
+        this.sourceClazz = source.getClass();
+        this.production = production;
     }
 
-    @Override
-    public T convertTo(S source) {
-        return null;
+    private void getAllMethod() {
+        methodMap = new HashMap<>();
+        Method[] methods = null;
+//        Method [] methods = production.getMethods();
+//        for(Method m : methods){
+//            methodMap.put(m.getName(),m);
+//        }
+        methods = production.getDeclaredMethods();
+        for (Method m : methods) {
+            if (!methodMap.containsKey(m.getName())) {
+                methodMap.put(m.getName(), m);
+            }
+        }
+        Class superClass = production.getSuperclass();
+        while (superClass != Object.class) {
+            methods = superClass.getDeclaredMethods();
+            for (Method m : methods) {
+                if (!methodMap.containsKey(m.getName())) {
+                    methodMap.put(m.getName(), m);
+                }
+            }
+            superClass = superClass.getSuperclass();
+        }
     }
+
+    @SuppressWarnings("unchecked")
+    public <T> T convertTo() {
+        Object produceObj = null;
+        try {
+            produceObj = production.newInstance();
+            getAllMethod();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return (T) produceObj;
+    }
+
 }
