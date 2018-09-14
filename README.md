@@ -1,2 +1,2 @@
-# Oto
-A Common Converter from Object to object
+# CommonConverter
+一个通过反射和RTTI,通过注解便可方便的完成Java对象的转换
