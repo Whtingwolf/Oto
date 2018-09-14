@@ -1,9 +1,13 @@
 package domain.pets;
 
+import converter.annotation.ReflectField;
+
 public class Dog extends Pet {
 
+    @ReflectField("name")
     String hostName = "withing";
 
+    @ReflectField("petName")
     String name = "jason";
 
     public String getHostName() {
