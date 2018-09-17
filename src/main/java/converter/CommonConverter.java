@@ -10,7 +10,7 @@ import java.util.function.Function;
 public abstract class CommonConverter {
     Map<String, Class> reflectionMap = new HashMap<>();
 
-    Function DEFAULT_FUNCTION;
+    Function DEFAULT_FUNCTION = (x) -> x;
 
     public <T> T convertTo(Object source, Function<Object, T> function) {
         return function.apply(source);
