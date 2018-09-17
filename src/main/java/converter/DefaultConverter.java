@@ -29,10 +29,6 @@ public class DefaultConverter {
     private void getAllMethod() {
         methodMap = new HashMap<>();
         Method[] methods = null;
-//        Method [] methods = production.getMethods();
-//        for(Method m : methods){
-//            methodMap.put(m.getName(),m);
-//        }
         methods = production.getDeclaredMethods();
         for (Method m : methods) {
             if (!methodMap.containsKey(m.getName())) {
@@ -59,7 +55,6 @@ public class DefaultConverter {
             getAllMethod();
             Field[] fields = getAnotatedField();
             initialProduction(produceObj, fields);
-            System.out.println(2);
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
