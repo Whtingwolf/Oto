@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CommonConvert.iml" filepath="$PROJECT_DIR$/CommonConvert.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/CommonConverter.iml" filepath="$PROJECT_DIR$/.idea/CommonConverter.iml" />
     </modules>
   </component>
 </project>

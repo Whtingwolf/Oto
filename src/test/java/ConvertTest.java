@@ -11,7 +11,7 @@ public class ConvertTest {
     @Test
     public void convertTest() {
         DefaultConverter defaultConverter = new DefaultConverter(new Husky(), HouseHost.class);
-        Host host = defaultConverter.convertTo();
+        Host host = defaultConverter.convertTo(new Husky(), HouseHost.class);
         Assert.assertEquals("withing", host.getName());
         Assert.assertEquals("jason", host.getPetName());
     }
@@ -19,6 +19,11 @@ public class ConvertTest {
     public <T> void genricTest(T source) {
         Class<?> clazz = source.getClass();
         System.out.println(clazz);
+    }
+
+    @Test
+    public void loggerTest(){
+        DefaultConverter.getInstance().loggerTest();
     }
 
     @Test

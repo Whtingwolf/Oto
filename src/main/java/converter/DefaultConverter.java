@@ -1,6 +1,8 @@
 package converter;
 
 import converter.annotation.ReflectField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -10,32 +12,57 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.stream.Stream;
 
-public class DefaultConverter {
+public class DefaultConverter{
 
     private Object source;
 
     private Class<?> sourceClazz;
 
-    private Class<?> production;
+    private Class<?> productionClazz;
+
+    private final static Logger logger = LoggerFactory.getLogger(ConvertTo.class);
 
     private HashMap<String, Method> methodMap;
+
+    public static DefaultConverter instance;
+
+    public static DefaultConverter getInstance(){
+        if(instance ==null){
+            synchronized (DefaultConverter.class) {
+                if (instance == null) {
+                    instance = new DefaultConverter();
+                }
+            }
+        }
+        return instance;
+    }
+
+    private DefaultConverter(){}
 
     public DefaultConverter(Object source, Class<?> production) {
         this.source = source;
         this.sourceClazz = source.getClass();
-        this.production = production;
+        this.productionClazz = production;
     }
+
+    public void loggerTest(){
+        logger.info("info log");
+        logger.debug("debug log");
+        logger.error("error log");
+        logger.error("Class :{} fail to instantial ",String.class.getName());
+    }
+
 
     private void getAllMethod() {
         methodMap = new HashMap<>();
         Method[] methods = null;
-        methods = production.getDeclaredMethods();
+        methods = productionClazz.getDeclaredMethods();
         for (Method m : methods) {
             if (!methodMap.containsKey(m.getName())) {
                 methodMap.put(m.getName(), m);
             }
         }
-        Class superClass = production.getSuperclass();
+        Class superClass = productionClazz.getSuperclass();
         while (superClass != Object.class) {
             methods = superClass.getDeclaredMethods();
             for (Method m : methods) {
@@ -48,19 +75,22 @@ public class DefaultConverter {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T convertTo() {
+    public <T,R> R convertTo(T source,Class<R> clazz) {
         Object produceObj = null;
+        this.source = source;
+        sourceClazz = source.getClass();
+        productionClazz = clazz;
         try {
-            produceObj = production.newInstance();
+            produceObj = clazz.newInstance();
             getAllMethod();
             Field[] fields = getAnotatedField();
             initialProduction(produceObj, fields);
         } catch (InstantiationException e) {
-            e.printStackTrace();
+            logger.error("Class : {} fail to instantial ",clazz.getName());
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            logger.error("Class : {} have not public no-reference constructor",clazz.getName());
         }
-        return (T) produceObj;
+        return (R) produceObj;
     }
 
     @SuppressWarnings("unchecked")
@@ -70,8 +100,8 @@ public class DefaultConverter {
             ReflectField setField = f.getAnnotation(ReflectField.class);
             Method setter = null;
             try {
-//                setter = getSetter(production.getDeclaredField(setField.value()), production);
-                setter = getSetter(getFieldAnywhere(production, setField.value()), production);
+//                setter = getSetter(productionClazz.getDeclaredField(setField.value()), productionClazz);
+                setter = getSetter(getFieldAnywhere(productionClazz, setField.value()), productionClazz);
                 setter.invoke(
                         produceObj,
                         getter.invoke(source)
