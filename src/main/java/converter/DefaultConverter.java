@@ -1,6 +1,8 @@
 package converter;
 
 import converter.annotation.ReflectField;
+import converter.ref_tool.FieldTool;
+import converter.ref_tool.MethodTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class DefaultConverter{
@@ -22,7 +25,7 @@ public class DefaultConverter{
 
     private final static Logger logger = LoggerFactory.getLogger(ConvertTo.class);
 
-    private HashMap<String, Method> methodMap;
+    private Map<String, Method> methodMap;
 
     public static DefaultConverter instance;
 
@@ -52,28 +55,6 @@ public class DefaultConverter{
         logger.error("Class :{} fail to instantial ",String.class.getName());
     }
 
-
-    private void getAllMethod() {
-        methodMap = new HashMap<>();
-        Method[] methods = null;
-        methods = productionClazz.getDeclaredMethods();
-        for (Method m : methods) {
-            if (!methodMap.containsKey(m.getName())) {
-                methodMap.put(m.getName(), m);
-            }
-        }
-        Class superClass = productionClazz.getSuperclass();
-        while (superClass != Object.class) {
-            methods = superClass.getDeclaredMethods();
-            for (Method m : methods) {
-                if (!methodMap.containsKey(m.getName())) {
-                    methodMap.put(m.getName(), m);
-                }
-            }
-            superClass = superClass.getSuperclass();
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public <T,R> R convertTo(T source,Class<R> clazz) {
         Object produceObj = null;
@@ -82,7 +63,7 @@ public class DefaultConverter{
         productionClazz = clazz;
         try {
             produceObj = clazz.newInstance();
-            getAllMethod();
+            methodMap =  new MethodTool().getAllMethods(productionClazz);
             Field[] fields = getAnotatedField();
             initialProduction(produceObj, fields);
         } catch (InstantiationException e) {
@@ -100,24 +81,23 @@ public class DefaultConverter{
             ReflectField setField = f.getAnnotation(ReflectField.class);
             Method setter = null;
             try {
-//                setter = getSetter(productionClazz.getDeclaredField(setField.value()), productionClazz);
                 setter = getSetter(getFieldAnywhere(productionClazz, setField.value()), productionClazz);
                 setter.invoke(
                         produceObj,
                         getter.invoke(source)
                 );
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error("the method:{} is no public ",setter.getName());
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                logger.error("the method:{} invoke fail",setter.getName());
             } catch (NoSuchFieldException e) {
-                e.printStackTrace();
+                logger.error("can't not find field {}",setField.value());
             }
         }
         return (T) produceObj;
     }
 
-    public Field getFieldAnywhere(Class clazz, String fieldName) throws NoSuchFieldException {
+    private Field getFieldAnywhere(Class clazz, String fieldName) throws NoSuchFieldException {
         Field field = null;
         Class circleClazz = clazz;
         while (field == null && circleClazz != Object.class) {
@@ -156,22 +136,12 @@ public class DefaultConverter{
         return null;
     }
 
-    public Field[] getAnotatedField() {
-        Field[] fields = getAllField();
+    private Field[] getAnotatedField() {
+        Field[] fields = new FieldTool().getAllField(sourceClazz);
         Stream<Field> stream = Stream.of(fields);
         return stream.filter((Field f) -> f.isAnnotationPresent(ReflectField.class)).toArray(Field[]::new);
     }
 
-    public Field[] getAllField() {
-        HashSet<Field> fieldSet = new HashSet<>();
-        fieldSet.addAll(Arrays.asList(sourceClazz.getDeclaredFields()));
-        Class superClazz = sourceClazz.getSuperclass();
-        while (superClazz != Object.class) {
-            fieldSet.addAll(Arrays.asList(superClazz.getDeclaredFields()));
-            superClazz = superClazz.getSuperclass();
-        }
-        Field[] fields = new Field[fieldSet.size()];
-        return fieldSet.toArray(fields);
-    }
+
 
 }
