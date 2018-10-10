@@ -22,14 +22,17 @@ public class ConvertTest {
     }
 
     @Test
-    public void loggerTest(){
-        DefaultConverter.getInstance().loggerTest();
-    }
-
-    @Test
     public void methodTest() {
         Dog dog = new Dog();
         genricTest(dog);
+    }
 
+    @Test
+    public void cloneTest(){
+        Host host = new Host();
+        host.setName("withing");
+        host.setPetName("123qwe");
+        Host clonehost = host.clone();
+        System.out.println(clonehost);
     }
 }

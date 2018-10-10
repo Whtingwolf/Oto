@@ -1,8 +1,6 @@
 package converter.classTree;
 
 
-import converter.abstraction.Converter;
-
 public class NodeElement {
 
     Class<?> clazz;

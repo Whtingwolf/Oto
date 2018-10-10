@@ -1,21 +1,18 @@
 package converter;
 
+import converter.abstraction.ConvertFrom;
+import converter.abstraction.ConvertTO;
 import converter.annotation.ReflectField;
 import converter.ref_tool.FieldTool;
-import converter.ref_tool.MethodTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.stream.Stream;
 
-public class DefaultConverter{
+public class DefaultConverter implements ConvertTO, ConvertFrom {
 
     private Object source;
 
@@ -23,9 +20,7 @@ public class DefaultConverter{
 
     private Class<?> productionClazz;
 
-    private final static Logger logger = LoggerFactory.getLogger(ConvertTo.class);
-
-    private Map<String, Method> methodMap;
+    private final static Logger logger = LoggerFactory.getLogger(DefaultConverter.class);
 
     public static DefaultConverter instance;
 
@@ -48,30 +43,42 @@ public class DefaultConverter{
         this.productionClazz = production;
     }
 
-    public void loggerTest(){
-        logger.info("info log");
-        logger.debug("debug log");
-        logger.error("error log");
-        logger.error("Class :{} fail to instantial ",String.class.getName());
-    }
 
+    @Override
     @SuppressWarnings("unchecked")
-    public <T,R> R convertTo(T source,Class<R> clazz) {
-        Object produceObj = null;
+    public <T,R> R convertTo(T source,Class<R> productClazz) {
+        Object productObj = null;
         this.source = source;
         sourceClazz = source.getClass();
-        productionClazz = clazz;
+        productionClazz = productClazz;
         try {
-            produceObj = clazz.newInstance();
-            methodMap =  new MethodTool().getAllMethods(productionClazz);
-            Field[] fields = getAnotatedField();
-            initialProduction(produceObj, fields);
+            productObj = productClazz.newInstance();
+            Field[] fields = getAnotatedField(sourceClazz);
+            initialProduction(productObj, fields);
         } catch (InstantiationException e) {
-            logger.error("Class : {} fail to instantial ",clazz.getName());
+            logger.error("Class : {} fail to instantial ",productClazz.getName());
         } catch (IllegalAccessException e) {
-            logger.error("Class : {} have not public no-reference constructor",clazz.getName());
+            logger.error("Class : {} have not public no-reference constructor",productClazz.getName());
         }
-        return (R) produceObj;
+        return (R) productObj;
+    }
+
+    @Override
+    public <T,R> T convertFrom(R source, Class<T> productClazz) {
+        Object productObj = null;
+        this.source = source;
+        sourceClazz = source.getClass();
+        productionClazz = productClazz;
+        try{
+            productObj = productClazz.newInstance();
+            Field[] fields = getAnotatedField(productionClazz);
+
+        }catch (InstantiationException e) {
+            logger.error("Class : {} fail to instantial ",productClazz.getName());
+        } catch (IllegalAccessException e) {
+            logger.error("Class : {} have not public no-reference constructor",productClazz.getName());
+        }
+        return (T) productObj;
     }
 
     @SuppressWarnings("unchecked")
@@ -136,12 +143,11 @@ public class DefaultConverter{
         return null;
     }
 
-    private Field[] getAnotatedField() {
+    private Field[] getAnotatedField(Class anooatedClass) {
         Field[] fields = new FieldTool().getAllField(sourceClazz);
         Stream<Field> stream = Stream.of(fields);
         return stream.filter((Field f) -> f.isAnnotationPresent(ReflectField.class)).toArray(Field[]::new);
     }
-
 
 
 }
