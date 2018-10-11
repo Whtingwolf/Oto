@@ -13,7 +13,7 @@ public class ConvertMutableTreeNode implements MutableTreeNode, Serializable {
     private static final long serialVersionUID = 1L;
     protected MutableTreeNode parent;
     protected ArrayList children;
-    NodeElement element;
+//    NodeElement element;
 
     public void add(MutableTreeNode Node) {
 
