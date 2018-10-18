@@ -11,6 +11,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 
 public class HomeWork {
+
     Trader raoul = new Trader("Raoul", "Cambridge");
     Trader mario = new Trader("Mario", "Milan");
     Trader alan = new Trader("Alan", "Cambridge");
@@ -32,6 +33,7 @@ public class HomeWork {
                 .sorted(Comparator.comparingInt(Transcation::getValue))
                 .collect(Collectors.toList());
         System.out.println(Arrays.toString(list.toArray()));
+
     }
 
     @Test
